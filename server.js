@@ -16,8 +16,6 @@ let io = require('socket.io')(server,{
     }
 })
 
-let data = []
-
 // socket.on('connection',()=>{
 //     setInterval(()=>{
 //         if(data.length>0){
@@ -38,15 +36,51 @@ let data = []
 //     res.json(null)
 
 // })
-app.post('/sendData',(req,res)=>{
-    //to check responses coming
-    let date = new Date();
+
+let mysocket 
+let id 
+let keys = {}
+io.on('connection',socket=>{
+    //mysocket = socket
     
-   console.log(date.toTimeString(),date.toDateString(),req.body);
-  io.emit('receive-data',req.body)
-  //  data.push(req.body)
-    res.sendStatus(200)
+    socket.on('join-room',(roomId,id)=>{
+        keys[roomId] = id
+        console.log('join-room',roomId)
+       // socket.join(socket.id)
+        //socket.broadcast.emit('receive-data',"123456789")
+        //socket.to(id).emit('receive-data', {msg: 'hello world.'})
+        //console.log(keys) 
+    })
+
+    socket.on('disconnect',()=>{
+        console.log('closed',socket.id)
+    })
 })
 
+app.post('/sendData',async (req,res)=>{
+    //to check responses coming
+    //let date = new Date();
+    
+    //console.log(date.toTimeString(),date.toDateString(),req.body);
+    //console.log(keys[req.body.sessionid])
+    
+    //if(keys[req.body.sessionid])
+    //   io.to(keys[req.body.sessionid]).emit('receive-data',req.body);
+   // let sockets = await io.fetchSockets();
+   // console.log(sockets[0].nsp.sockets)
+
+    //let iterator = sockets[0].adapter.rooms.get(req.body.sessionid).keys()
+    //let val = iterator.next().value
+   // console.log(val)
+    //io.to(val.toString()).emit('receive-data',req.body);
+    //if(val)
+    //io.emit('receive-data',"minority");
+   
+   // console.log(val)
+    io.emit('receive-data', req.body);
+    
+    res.sendStatus(200)
+})
 server.listen(PORT ,()=>console.log(`server is live ${PORT}`))
+
 
